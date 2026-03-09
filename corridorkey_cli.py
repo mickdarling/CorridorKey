@@ -314,9 +314,13 @@ def run_inference_cmd(
 def wizard(
     ctx: typer.Context,
     path: Annotated[str, typer.Argument(help="Target path (Windows or local)")],
+    backend: Annotated[
+        str,
+        typer.Option(help="Inference backend: auto, torch, mlx"),
+    ] = "auto",
 ) -> None:
     """Interactive wizard for organizing clips and running the pipeline."""
-    interactive_wizard(path, device=ctx.obj["device"])
+    interactive_wizard(path, device=ctx.obj["device"], backend=backend)
 
 
 # ---------------------------------------------------------------------------
@@ -324,7 +328,7 @@ def wizard(
 # ---------------------------------------------------------------------------
 
 
-def interactive_wizard(win_path: str, device: str | None = None) -> None:
+def interactive_wizard(win_path: str, device: str | None = None, backend: str | None = None) -> None:
     console.print(Panel("[bold]CORRIDOR KEY — SMART WIZARD[/bold]", style="cyan"))
 
     # 1. Resolve Path
@@ -515,6 +519,7 @@ def interactive_wizard(win_path: str, device: str | None = None) -> None:
                     run_inference(
                         ready,
                         device=device,
+                        backend=backend,
                         settings=settings,
                         on_clip_start=ctx_progress.on_clip_start,
                         on_frame_complete=ctx_progress.on_frame_complete,
